@@ -9,18 +9,33 @@
 
 ## Edit the following Flask application code so that if you run the application locally and got to the URL http://localhost:5000/question, you see a form that asks you to enter your favorite number. Once you enter a number and submit it to the form, you should then see a web page that says "Double your favorite number is <number>". For example, if you enter 2 into the form, you should then see a page that says "Double your favorite number is 4". Careful about types in your Python code!
 ## You can assume a user will always enter a number only.
-
-from flask import Flask
+from flask import Flask, render_template, request
+import requests
 app = Flask(__name__)
 app.debug = True
 
-@app.route('/')
-def hello_to_you():
-    return 'Hello!'
+@app.route('/question')
+def number2():
+    html_form = '''
+    <html>
+    <body>
+    <form method="GET" action="http://localhost:5000/result">
+        <label>Enter your favorite number:
+            <input name="num" value="0" type="number">
+        </label></br>
+        <input type="submit" value="Submit">
+    </form>
+    </body>
+    </html>
+    '''
+    return html_form
 
-
-if __name__ == '__main__':
-    app.run()
+@app.route('/result', methods = ['GET', 'POST'])
+def result_doubled():
+    if request.method == 'GET':
+        result = request.args
+        number = int(result['num'])*2
+        return "Double your favoritre number is " + str(number)
 
 
 ## [PROBLEM 2]
@@ -34,11 +49,27 @@ if __name__ == '__main__':
 
 # You can assume that a user will give you the type of input/response you expect in your form; you do not need to handle errors or user confusion. (e.g. if your form asks for a name, you can assume a user will type a reasonable name; if your form asks for a number, you can assume a user will type a reasonable number; if your form asks the user to select a checkbox, you can assume they will do that.)
 
+@app.route('/name')
+def cubeView():
+    html_form = '''
+    <html>
+    <body>
+    <form method="GET" action="http://localhost:5000/result-name">
+        <label>Enter your name:
+            <input type="text" name="fullname" value=" ">
+        </label></br>
+        <input type="submit" value="Submit">
+    </form>
+    </body>
+    </html>
+    '''
+    return html_form
 
+@app.route('/result-name', methods = ['GET', 'POST'])
+def result_cube():
+    result = request.args
+    fullname = result.get('fullname')
+    return "your name is " + str(len(fullname)) +" letters long"
 
-
-
-
-
-
-
+if __name__ == '__main__':
+	app.run()
